@@ -237,7 +237,11 @@ fn start_asset(
         version: asset.version.clone(),
         required: matches!(policy, InstallPolicy::Required { .. }),
         required_version: matches!(policy, InstallPolicy::Required { .. })
-            .then(|| crate::server::core::update::CURRENT_VERSION.to_string()),
+            .then(|| {
+                super::compatibility::minimum_version(id)
+                    .unwrap_or(crate::server::core::update::CURRENT_VERSION)
+                    .to_string()
+            }),
         updated_at: logging::now_ms(),
         ..Default::default()
     };

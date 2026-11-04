@@ -1,18 +1,32 @@
 //! 官方配套插件的最低版本校验独立于日常更新偏好。
+//!
+//! ── 为什么基线是固定值而不是 [`CURRENT_VERSION`] ──────────────
+//! 早先这里直接把网关版本当最低要求，结果是：网关一升小版本，手上装着的
+//! 官方插件立刻被判「版本过低」并拒绝加载 —— 插件的发布节奏本来就落后于
+//! 网关，这个闸门等于把「没跟上发版」当成「不兼容」。
+//!
+//! 真正的兼容性由协议版本（`pack.json` 的 `protocol`，见
+//! [`super::install::validate_manifest`]）把关；版本号只用来判断「这个包
+//! 太老、建议补齐」。所以基线固定为引入协议校验时的版本，不再随网关漂移。
 
 use serde_json::{json, Value};
 
 use super::install::{InstalledPack, PackRegistry};
 use super::{operations, update, PackSummary};
 use crate::server::core::task_state::{self, Claim, ManualBackoff};
-use crate::server::core::update::{compare_versions, CURRENT_VERSION};
+use crate::server::core::update::compare_versions;
 use crate::server::logging;
 
 pub(super) const RETRY_INTERVAL_MS: i64 = 5 * 60_000;
 const OFFICIAL_PACKS: &[&str] = &["agent2api-providers", "agent2api-web-providers"];
 
+/// 官方配套插件的最低版本基线。改动它等于宣布「低于此版本的包不再加载」。
+pub(super) const MINIMUM_OFFICIAL_VERSION: &str = "3.4.0";
+
 pub(super) fn minimum_version(id: &str) -> Option<&'static str> {
-    OFFICIAL_PACKS.contains(&id).then_some(CURRENT_VERSION)
+    OFFICIAL_PACKS
+        .contains(&id)
+        .then_some(MINIMUM_OFFICIAL_VERSION)
 }
 
 pub(super) fn version_error(id: &str, version: &str) -> Option<String> {
@@ -34,7 +48,10 @@ pub(crate) fn provider_error(provider: &str) -> Option<String> {
 }
 
 fn key(id: &str) -> String {
-    format!("pluginRequirement:{id}:{CURRENT_VERSION}:{}", super::host_target())
+    format!(
+        "pluginRequirement:{id}:{MINIMUM_OFFICIAL_VERSION}:{}",
+        super::host_target()
+    )
 }
 
 fn cached_asset(state: &task_state::TaskState, id: &str) -> Option<update::PackAsset> {
@@ -54,7 +71,7 @@ pub(super) fn update_for(pack: &PackSummary) -> Option<Value> {
     let asset = cached_asset(&state, &pack.id);
     let task = operations::snapshot()["operations"].as_array()
         .and_then(|tasks| tasks.iter().find(|task| task["id"] == pack.id
-            && task["requiredVersion"].as_str() == Some(CURRENT_VERSION)))
+            && task["requiredVersion"].as_str() == Some(MINIMUM_OFFICIAL_VERSION)))
         .cloned()
         .unwrap_or(Value::Null);
     let operation_error = task["error"].as_str().or_else(|| task["hostError"].as_str());
