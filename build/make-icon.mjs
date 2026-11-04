@@ -2,7 +2,7 @@
 /**
  * 生成应用图标源图（1024×1024 PNG），供 `tauri icon` 派生出各尺寸图标。
  *
- * 设计：圆角方形苹果蓝底（#007AFF）+ 白色双向箭头（呼应「本地代理转发」）。
+ * 设计：圆角方形苹果蓝底（#007AFF）+ 白色 "A2A" 字样（产品名缩写）。
  * 不依赖任何图形库：手写 SDF 光栅化 + 3×3 超采样抗锯齿 + 手写 PNG 编码。
  */
 
@@ -89,43 +89,78 @@ function sdCapsule(px, py, ax, ay, bx, by, thickness) {
 }
 
 /**
- * 双向箭头（⇄）：上箭头朝右、下箭头朝左。
- * 坐标以 [0,1] 为画布（shapeAlpha 里再减去 0.5 归一化）。
- * 斜线起点收进横杆末端，让横杆与箭头衔接成一个箭头形状而不是一坨。
+ * "A2A" 字形：全部由胶囊线段拼成，坐标以 [0,1] 为画布
+ * （shapeAlpha 里再减去 0.5 归一化）。
+ *
+ * 三个字符等宽居中：A · 2 · A。笔画粗细统一，转角靠线段端点自然形成
+ * 圆角，和蓝底圆角方形的观感一致。
  */
-const ARROW_THICKNESS = 0.046;
-const TOP_Y = 0.385;
-const BOT_Y = 0.615;
-const TIP_X = 0.782;
-const TAIL_X = 0.218;
-const HEAD_HALF = 0.105;   // 箭头张开的半高
-const HEAD_BACK = 0.118;   // 从尖端往回收的水平距离
-const STROKES = [
-  // 上：横杆到箭头根部，尖端在右
-  [TAIL_X, TOP_Y, TIP_X - HEAD_BACK, TOP_Y],
-  [TIP_X, TOP_Y, TIP_X - HEAD_BACK, TOP_Y - HEAD_HALF],
-  [TIP_X, TOP_Y, TIP_X - HEAD_BACK, TOP_Y + HEAD_HALF],
-  // 下：横杆到箭头根部，尖端在左
-  [TIP_X, BOT_Y, TAIL_X + HEAD_BACK, BOT_Y],
-  [TAIL_X, BOT_Y, TAIL_X + HEAD_BACK, BOT_Y - HEAD_HALF],
-  [TAIL_X, BOT_Y, TAIL_X + HEAD_BACK, BOT_Y + HEAD_HALF],
+const STROKE = 0.036;       // 笔画半宽
+const TOP = 0.30;           // 字符顶部
+const BOTTOM = 0.70;        // 字符底部
+const CHAR_W = 0.18;        // 单字符宽度
+const GAP = 0.10;           // 字符间距
+const TOTAL_W = CHAR_W * 3 + GAP * 2;
+const START_X = (1 - TOTAL_W) / 2;
+const SCALE = 0.94;         // 整体留边，避免贴到圆角
+const CENTERS = [
+  START_X + CHAR_W / 2,
+  START_X + CHAR_W + GAP + CHAR_W / 2,
+  START_X + 2 * (CHAR_W + GAP) + CHAR_W / 2,
 ];
 
-/** 底为圆角方形，前景为箭头；坐标已归一化到 [-0.5, 0.5] */
+/** 字母 A：两条腿 + 中间横杠 */
+function letterA(cx) {
+  const apex = [cx, TOP];
+  const left = [cx - 0.095, BOTTOM];
+  const right = [cx + 0.095, BOTTOM];
+  const barY = 0.56;
+  const barHalf = 0.095 * (barY - TOP) / (BOTTOM - TOP);
+  return [
+    [...apex, ...left],
+    [...apex, ...right],
+    [cx - barHalf, barY, cx + barHalf, barY],
+  ];
+}
+
+/** 数字 2：顶部圆弧（多段折线近似）+ 右下过渡 + 斜线 + 底横 */
+function digit2(cx) {
+  const arc = [
+    [cx - 0.085, 0.38], [cx - 0.08, 0.34], [cx - 0.055, 0.31],
+    [cx - 0.02, 0.30], [cx + 0.02, 0.30], [cx + 0.055, 0.31],
+    [cx + 0.08, 0.34], [cx + 0.085, 0.38], [cx + 0.085, 0.42],
+  ];
+  const strokes = [];
+  for (let i = 0; i < arc.length - 1; i++) strokes.push([...arc[i], ...arc[i + 1]]);
+  strokes.push([cx + 0.085, 0.42, cx - 0.10, BOTTOM]);   // 斜线
+  strokes.push([cx - 0.10, BOTTOM, cx + 0.10, BOTTOM]);  // 底横
+  return strokes;
+}
+
+const STROKES = [
+  ...letterA(CENTERS[0]),
+  ...digit2(CENTERS[1]),
+  ...letterA(CENTERS[2]),
+].map(([ax, ay, bx, by]) => [
+  0.5 + (ax - 0.5) * SCALE, 0.5 + (ay - 0.5) * SCALE,
+  0.5 + (bx - 0.5) * SCALE, 0.5 + (by - 0.5) * SCALE,
+]);
+
+/** 底为圆角方形，前景为 "A2A"；坐标已归一化到 [-0.5, 0.5] */
 function shapeAlpha(nx, ny) {
   const insideRect = sdRoundedRect(nx, ny, 0.5, 0.5, 0.225);
-  let arrow = Infinity;
+  let glyph = Infinity;
   for (const [ax, ay, bx, by] of STROKES) {
-    arrow = Math.min(arrow, sdCapsule(nx, ny, ax - 0.5, ay - 0.5, bx - 0.5, by - 0.5, ARROW_THICKNESS));
+    glyph = Math.min(glyph, sdCapsule(nx, ny, ax - 0.5, ay - 0.5, bx - 0.5, by - 0.5, STROKE));
   }
-  return { rect: insideRect, arrow };
+  return { rect: insideRect, arrow: glyph };
 }
 
 // ─── 光栅化（3×3 超采样）────────────────────────────────────
 
 const SS = 3;
 
-/** 线性插值：目前只用于把纯白箭头按覆盖率混到纯色底上 */
+/** 线性插值：把纯白文字按覆盖率混到纯色底上 */
 function lerp(a, b, t) {
   return a + (b - a) * t;
 }
@@ -134,7 +169,7 @@ function lerp(a, b, t) {
  * 把一块画布光栅化成 RGBA 像素。
  *
  * `shape` 收归一化坐标（[-0.5, 0.5]），返回 `{ rect, arrow }` 两个 SDF 值。
- * 分成「底」与「箭头」两层是为了让两者各自带抗锯齿覆盖率 —— 箭头压在底上，
+ * 分成「底」与「文字」两层是为了让两者各自带抗锯齿覆盖率 —— 文字压在底上，
  * 边缘不能直接取整。
  */
 function rasterize(size, shape) {
@@ -157,12 +192,11 @@ function rasterize(size, shape) {
       const arrowA = arrowHits / total;
       if (rectA === 0) continue;
 
-      // 底色改为纯苹果蓝 #007AFF（与 iOS/macOS 系统蓝同族的观感），不再做对角渐变，
-      // 这样图标在浅色/深色壁纸和 Dock 里都保持同一个可辨识的品牌蓝。
+      // 底色：纯苹果蓝 #007AFF，在浅色/深色壁纸和 Dock 里都保持同一个品牌蓝。
       let r = 0x00;
       let g = 0x7a;
       let b = 0xff;
-      // 箭头为纯白，按覆盖率与底色混合
+      // 文字为纯白，按覆盖率与底色混合
       if (arrowA > 0) {
         r = lerp(r, 255, arrowA);
         g = lerp(g, 255, arrowA);
@@ -184,6 +218,15 @@ mkdirSync(dirname(OUT), { recursive: true });
 writeFileSync(OUT, encodePng(SIZE, SIZE, pixels));
 console.log(`[icon] 已生成 ${OUT}`);
 
+// ─── PWA 普通图标（180 / 192 / 512）──────────────────────────
+// 与 source.png 同一套形状（带圆角、透明四角），只是尺寸不同。
+// maskable 那一档单独生成，见下。
+for (const size of [180, 192, 512]) {
+  const out = join(HERE, '..', 'desktop-tauri', 'ui', 'assets', `app-icon-${size}.png`);
+  writeFileSync(out, encodePng(size, size, rasterize(size, shapeAlpha)));
+  console.log(`[icon] 已生成 ${out}`);
+}
+
 // ─── PWA maskable 图标 ──────────────────────────────────────
 //
 // 「maskable」是 Android 自适应图标用的那一档：系统会**按自己的形状裁剪**
@@ -193,19 +236,19 @@ console.log(`[icon] 已生成 ${OUT}`);
 // 所以这一版与 source.png 有两处必须不同，不能直接复用同一张图：
 //   ① **满铺、不透明、无圆角** —— 带透明圆角的图被裁成圆形后，四角会露出
 //      底色（黑边），且规范明确要求 maskable 图标不能有透明像素；
-//   ② **箭头缩到 60%** —— 留出被裁剪的余量，放大 1.33 倍后仍完整。
+//   ② **文字缩到 72%** —— 留出被裁剪的余量，放大 1.33 倍后仍完整。
 //
 // 输出直接落到 `ui/assets/`（手机端静态资源目录），不进 tauri icons ——
 // 那一套是桌面端安装包用的，与 PWA 无关。
 const MASKABLE_OUT = join(HERE, '..', 'desktop-tauri', 'ui', 'assets', 'app-icon-maskable-512.png');
 const MASKABLE_SIZE = 512;
-/** 箭头缩放：0.6 时箭头横向跨度约 0.34，落在 80% 安全圆内绰绰有余 */
-const MASKABLE_SCALE = 0.6;
+/** 文字缩放：0.72 时文字横向跨度约 0.53，落在 80% 安全圆内 */
+const MASKABLE_SCALE = 0.72;
 
 const maskablePixels = rasterize(MASKABLE_SIZE, (nx, ny) => {
   // 底：满铺整块画布（SDF 恒 <0），于是没有透明像素、也没有圆角
   const rect = -1;
-  // 箭头：坐标放大 = 图形缩小，居中不变
+  // 文字：坐标放大 = 图形缩小，居中不变
   const { arrow } = shapeAlpha(nx / MASKABLE_SCALE, ny / MASKABLE_SCALE);
   return { rect, arrow };
 });
