@@ -12,8 +12,14 @@ use crate::server::core::update::client::{
 };
 use crate::server::core::update::{compare_versions, is_prerelease_version, source};
 
-pub const INDEX_REPO: &str = "Agent2plugin/Agent2plugin";
-pub const FALLBACK_REPO: &str = "Agent2Builder/agent2api-providers-releases";
+/// 插件索引与兜底仓库。
+///
+/// 个人自用构建：两者都指向自己的 fork。本仓库没有 `index.json` /
+/// `app.json`，索引读不到时按既有逻辑回落到 `DEFAULT_REPO`（同样是本仓库），
+/// 因此不会再从官方插件仓库拉取 —— 那会覆盖 `plugins/Agent2WebProviders`
+/// 编译出来的修复版 exe。
+pub const INDEX_REPO: &str = "asonnychen/Agent2API";
+pub const FALLBACK_REPO: &str = "asonnychen/Agent2API";
 const GITHUB_API: &str = "https://api.github.com";
 const QUERY_TIMEOUT_MS: u64 = 30_000;
 

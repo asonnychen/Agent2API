@@ -30,7 +30,10 @@ use crate::server::config::UpdateChannels;
 /// 这里保留一个可用值，是为了「索引读不到也还能更新」。
 ///
 /// `WORKBUDDY_UPDATE_REPO` 环境变量仍可覆盖（最高优先级，且不读索引）。
-pub const DEFAULT_REPO: &str = "Agent2Builder/agent2api-releases";
+///
+/// 本仓库是个人自用构建：更新源指向自己的 fork，不再连官方构建仓库 ——
+/// 官方 Release 里是原产品 Agent2API 的安装包，装上去等于换回另一个应用。
+pub const DEFAULT_REPO: &str = "asonnychen/Agent2API";
 
 /// 项目源码仓库（`owner/repo`）。
 ///
@@ -43,7 +46,9 @@ pub const DEFAULT_REPO: &str = "Agent2Builder/agent2api-releases";
 /// 两者只有「换源码仓库」时才需要一起改（换构建仓库不该动它）。
 ///
 /// 网页端 / 手机端拿到的 `sourceRepository` 就是它（见 `build_check_result`）。
-pub const SOURCE_REPO: &str = "aimod-cc/Agent2API";
+///
+/// 个人自用构建指向自己的 fork。
+pub const SOURCE_REPO: &str = "asonnychen/Agent2API";
 
 /// GitHub API 根（Node 版 GITHUB_API）—— [`api_base`] 的默认值
 pub const GITHUB_API: &str = "https://api.github.com";

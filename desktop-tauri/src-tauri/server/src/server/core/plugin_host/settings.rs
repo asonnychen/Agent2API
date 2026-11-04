@@ -39,8 +39,8 @@ impl Default for PluginSettings {
             interval: config::DEFAULT_UPDATE_CHECK_MINUTES,
             stable: true,
             beta: false,
-            auto_update: true,
-            auto_install_official: true,
+            auto_update: false,
+            auto_install_official: false,
         }
     }
 }
