@@ -17,8 +17,10 @@ chatglm = []
 deepseek = []
 
 [dependencies]
-agent2api-provider-protocol = { git = "https://github.com/ProvidersPlugin/Agent2Providers", tag = "v3.4.0" }
-agent2api-provider-sdk = { git = "https://github.com/ProvidersPlugin/Agent2Providers", tag = "v3.4.0" }
+# SDK 与协议库随仓库一起管理（plugins/Agent2Providers），不再按 git tag 拉取：
+# 改协议时本地立刻生效，离线也能编译。
+agent2api-provider-protocol = { path = "../../../Agent2Providers/crates/provider-protocol" }
+agent2api-provider-sdk = { path = "../../../Agent2Providers/crates/provider-sdk" }
 serde_json = "1"
 reqwest = { version = "0.12", default-features = false, features = ["json", "stream", "rustls-tls", "socks", "multipart"] }
 url = "2"

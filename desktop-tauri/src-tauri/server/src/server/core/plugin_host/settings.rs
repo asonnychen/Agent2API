@@ -34,8 +34,11 @@ impl Default for PluginSettings {
     fn default() -> Self {
         Self {
             channel_mode: SettingsMode::Follow,
-            check_mode: SettingsMode::Follow,
-            auto_check: true,
+            // 自用构建：插件只从本地 zip 安装，默认不做任何联网检查。
+            // 用 Custom 而不是 Follow —— Follow 会把软件更新的自动检查开关
+            // 原样搬过来，软件那边开着就等于插件也在联网查。
+            check_mode: SettingsMode::Custom,
+            auto_check: false,
             interval: config::DEFAULT_UPDATE_CHECK_MINUTES,
             stable: true,
             beta: false,

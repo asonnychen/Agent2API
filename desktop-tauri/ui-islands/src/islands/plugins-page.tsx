@@ -5,12 +5,12 @@ import {
   CollapsibleTrigger, Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader,
   DialogTitle, Input, Progress,
 } from '@ui'
-import { InstalledPluginCard, StorePluginCard } from './plugins-cards'
+import { InstalledPluginCard } from './plugins-cards'
 import { PluginNotesDialog, type PluginNotes } from './plugins-notes'
 import { PluginPackSettingsDialog } from './plugins-pack-settings'
 import { PluginSettingsDialog } from './plugins-settings'
 import { api, bridge, errorMessage, pluginName, readBase64, toast } from './plugins-shared'
-import type { PackSummary, PluginMutation, PluginOperation, PluginUpdate, PluginsPayload, ReleaseState } from './plugins-types'
+import type { PackSummary, PluginMutation, PluginOperation, PluginsPayload } from './plugins-types'
 import { t } from '../i18n'
 
 const MIB = 1024 * 1024
@@ -117,22 +117,6 @@ function PluginsPage(): React.ReactElement {
     finally { if (mounted.current) setBusy('') }
   }
 
-  async function check(): Promise<void> {
-    await run('check', async () => {
-      const result = await api<{ updates: PluginUpdate[]; error: boolean; reason?: string }>('GET', '/api/plugins/update')
-      await load()
-      if (result.error) toast(result.reason || t('检查更新失败'), 'err')
-    })
-  }
-
-  async function refreshStore(): Promise<void> {
-    await run('refresh', async () => {
-      const result = await api<ReleaseState>('GET', '/api/plugins/release')
-      await load()
-      if (result.error) toast(result.reason || t('检查更新失败'), 'err')
-    })
-  }
-
   async function accept(result: PluginMutation): Promise<void> {
     setPayload(previous => previous ? { ...previous, ...result } : previous)
     await synchronize(result)
@@ -173,11 +157,8 @@ function PluginsPage(): React.ReactElement {
   const host = payload?.host
   const catalog = payload?.catalog
   const store = catalog?.plugins || []
-  const installedIds = new Set(packs.map(pack => pack.id))
-  const storePlugins = store.filter(item => !installedIds.has(item.id))
   const operations = payload?.operations || []
   const active = operations.some(operation => operation.active)
-  const target = payload?.target || ''
   const locked = Boolean(busy)
   const settingsPack = packs.find(pack => pack.id === settingsPackId)
   const settingsOperation = operations.find(operation => operation.id === settingsPackId)
@@ -197,12 +178,6 @@ function PluginsPage(): React.ReactElement {
           <Badge variant={host?.running ? 'success' : 'outline'}>
             {host?.running ? t('运行中') : packs.length ? t('未运行') : t('未安装')}
           </Badge>
-          <Button variant='outline' size='sm' disabled={locked} onClick={() => void refreshStore()}>
-            {busy === 'refresh' ? t('刷新中…') : t('刷新')}
-          </Button>
-          <Button variant='outline' size='sm' disabled={locked} onClick={() => void check()}>
-            {busy === 'check' || catalog?.checking ? t('检查中…') : t('检查更新')}
-          </Button>
           <Button variant='outline' size='sm' onClick={() => setSettingsOpen(true)}>{t('插件设置')}</Button>
           <Button variant='outline' size='sm' disabled={locked || active} onClick={pickFile}>{t('从文件安装…')}</Button>
         </div>
@@ -215,11 +190,6 @@ function PluginsPage(): React.ReactElement {
           <Progress value={null} />
         </div> : null}
         <div className='grid grid-cols-1 items-start gap-3.5 min-[900px]:grid-cols-2'>
-          {storePlugins.map(item => <StorePluginCard key={item.id} item={item} target={target}
-            operation={operations.find(operation => operation.id === item.id)} disabled={locked}
-            onInstall={() => void start(item.id, false)}
-            onNotes={() => setNotes({ name: pluginName(item.id, item.name), version: item.version || '',
-              notes: item.notes, page: item.page, prerelease: item.prerelease })} />)}
           {packs.map(pack => {
             const update = payload?.updates?.find(item => item.id === pack.id)
             const operation = operations.find(item => item.id === pack.id)
@@ -232,10 +202,9 @@ function PluginsPage(): React.ReactElement {
                 notes: update?.notes, page: update?.page, prerelease: update?.prerelease })} />
           })}
         </div>
-        {!storePlugins.length && !packs.length ? <div className='rounded-lg border border-border bg-surface px-4 py-5'>
-          <p className='text-[13px] font-medium'>{!payload || catalog?.checking
-            ? t('正在读取插件列表…') : t('暂无可安装的插件')}</p>
-          <p className='mt-2 text-[12px] text-subtle'>{errorMessage(catalog?.reason) || t('可以点击「刷新」读取插件仓库，或从本地 zip 安装插件。')}</p>
+        {!packs.length ? <div className='rounded-lg border border-border bg-surface px-4 py-5'>
+          <p className='text-[13px] font-medium'>{!payload ? t('正在读取插件列表…') : t('还没有安装插件')}</p>
+          <p className='mt-2 text-[12px] text-subtle'>{t('插件只支持从本地 zip 安装：点右上角「从文件安装…」选中插件包即可。')}</p>
         </div> : null}
         {payload ? <Collapsible className='mt-3 rounded-md border border-hairline bg-surface-2'>
           <CollapsibleTrigger render={<Button variant='ghost' />}
@@ -259,7 +228,7 @@ function PluginsPage(): React.ReactElement {
       </div>
       <CardFooter className='panel-foot'>{t('插件包与主程序分开安装、分开升级。卸载插件后账号数据仍然保留，重新装回即可继续使用；仅该包提供的转发与添加账号需要插件，本体订阅不受影响。')}</CardFooter>
     </Card>
-    <PluginSettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} onChanged={check} />
+    <PluginSettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} onChanged={load} />
     {settingsPack ? <PluginPackSettingsDialog key={settingsPack.id} pack={settingsPack}
       name={store.find(item => item.id === settingsPack.id)?.name}
       disabled={locked || settingsOperation?.active === true} onClose={() => setSettingsPackId(null)}
