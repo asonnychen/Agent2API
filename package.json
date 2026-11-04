@@ -10,6 +10,7 @@
     "tauri:install": "npm --prefix desktop-tauri install",
     "tauri:dev": "npm --prefix desktop-tauri run dev",
     "tauri:build": "npm --prefix desktop-tauri run build",
+    "dist": "node build/make-dist.mjs",
     "mobile:install": "npm --prefix desktop-tauri/mobile install",
     "mobile:build": "npm --prefix desktop-tauri/mobile run build",
     "mobile:watch": "npm --prefix desktop-tauri/mobile run watch",

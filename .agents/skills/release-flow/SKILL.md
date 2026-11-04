@@ -5,6 +5,11 @@ description: Agent2API（workbuddy）仓库的协作与发版规范 —— 分�
 
 # Agent2API 协作与发版规范
 
+> **本仓库是自用构建（A2A Gateway），下面第 0.5 节起的三仓库链路不适用。**
+> 更新源与插件索引都指向 `asonnychen/Agent2API`，没有构建仓库、没有签名密钥、不发 Docker 镜像。
+> 本仓库发版只有两步：`npm run dist` 产出安装包与插件 zip → `gh release create vX.Y.Z <安装包>`。
+> 其余章节保留作上游规范参考；涉及「构建仓库 / 索引仓库 / 镜像 / 签名 secret」的步骤一律跳过。
+
 覆盖两类工作：**日常协作**（分支落脚点、PR 署名、Issue 落款，第 1–3 节）与**发版**（版本号、更新日志、tag、Release、验收，第 4–7 节），排错见第 8 节。
 
 ## 0. 两条人工红线（必须停下等确认）
@@ -125,8 +130,8 @@ GitHub 的归属规则只有一条：**提交头里的 author 邮箱出现在某
 - **改完第 6 处，必须顺手把 `desktop-tauri/mobile/package-lock.json` 根部的 `version` 也改成同一个值**（文件顶层的 `"version"` 与 `packages[""].version` 两处）。`npm ci` 对这两处不一致是**静默容忍**的（实测不会报错，也不会自动改），漏改 CI 照绿，但仓库里会留下版本号不一致的 lock 文件，下次谁跑 `npm install` 又会把它改回来，平白多出一个无关 diff。桌面端那几处没有这个问题（`desktop-tauri/package-lock.json` 的版本本来就落后，不随发版改）。
 - 应用内「关于」与更新检查读的是 `env!("CARGO_PKG_VERSION")`（第 5 处），改完跑一次 `cargo check` 让 `Cargo.lock` 跟着刷新。
 - 手机端界面目前**不显示**包自身版本号（只显示所连网关的版本）；要核对版本，看系统「应用信息」页，或直接看 Release 附件名。
-- **顺手过一遍安装文档**：安装说明已经从 README 搬进 `docs/install.md`（README 只留速查表 + 一个链接），另有 5 份译文 `docs/install.{en,zh-Hant,ja,ko,pt-BR}.md`，六份内容一一对应。凡是这次改动碰到了**安装 / 升级 / 卸载步骤、产物体名、默认端口、环境变量、安装脚本参数**，六份都要同步改；README 速查表受影响时也一起改。
-- **README 语言落点**：根 `README.md` 是**英文**（GitHub 默认展示），简体中文在 `docs/README.zh-CN.md`，其余为 `docs/README.{zh-Hant,ja,ko,pt-BR}.md`。中文仍是文案源语言，支持矩阵等六份要同步的内容改完记得回填英文根 README。
+- **顺手过一遍安装文档**：安装说明已经从 README 搬进 `docs/install.md`（README 只留速查表 + 一个链接），英文版 `docs/install.en.md`，两份内容一一对应。凡是这次改动碰到了**安装 / 升级 / 卸载步骤、产物体名、默认端口、环境变量、安装脚本参数**，两份都要同步改；README 速查表受影响时也一起改。
+- **README 语言落点**：根 `README.md` 是**英文**（GitHub 默认展示），简体中文在 `docs/README.zh-CN.md`。中文仍是文案源语言，支持矩阵等两份要同步的内容改完记得回填英文根 README。
 
 ## 5. 正式版发版流程
 
@@ -308,7 +313,7 @@ gh run list --repo Agent2Builder/agent2api-releases --limit 4
 - [ ] Docker Hub：`aimodcc/agent2api` 的 Tags 页出现 `<版本>` 与 `latest`，Pushed 时间一致；GHCR：`ghcr.io/aimod-cc/agent2api:<版本>` 可拉（**新包默认私有**，首次要去包设置改 Public）；
 - [ ] **更新检查真的能查到**（这条最容易漏）：`gh release view vX.Y.Z --repo Agent2Builder/agent2api-releases` 有内容，且索引仓库的 `app.json` 里 `app.repo` 指向同一个仓库。两者对不上时，用户面板会显示「已是最新」；
 - [ ] 安装包「关于」页版本号与 tag 一致；
-- [ ] 安装文档对得上实际产物：`docs/install.md` 与 5 份译文的产物名、端口、命令、环境变量跟这次 Release 一致（README 里那几张速查表同理）；
+- [ ] 安装文档对得上实际产物：`docs/install.md` 与英文版 `docs/install.en.md` 的产物名、端口、命令、环境变量跟这次 Release 一致（README 里那几张速查表同理）；
 - [ ] beta 版多一条：Release 显示 **Prerelease**；Docker Hub 上完整版本标签与 `beta` 的镜像 digest 一致，包含 amd64 / arm64，且 `latest` 没有跟着动。
 
 ## 8. 已知坑与排查
@@ -370,6 +375,6 @@ gh run list --repo Agent2Builder/agent2api-releases --limit 4
 ### 8.5 其它
 
 - **APK 构建的两处环境差异**（构建仓库的 `release.yml` 已处理，改这块时别删）：`android/gradle.properties` 里的 `org.gradle.java.home` 是本机 Windows 绝对路径，runner 上要删掉回落 `JAVA_HOME`；`gradle-wrapper.properties` 的 `distributionUrl` 指向腾讯云镜像，runner 在海外要换回官方源。
-- **APK 的产物名由 `mobile/package.json` 的 version 决定**：`Agent2API-<版本>.apk`，`release.sh` 原样挂上 Release。安装文档六份里写的也是这个名字，改命名规则要连文档一起改。
+- **APK 的产物名由 `mobile/package.json` 的 version 决定**：`Agent2API-<版本>.apk`，`release.sh` 原样挂上 Release。安装文档两份里写的也是这个名字，改命名规则要连文档一起改。
 - **推含工作流改动的提交会被拒**：报错 `refusing to allow an OAuth App to create or update workflow ... without workflow scope`。解决：`gh auth switch --user <账号>` 切到目标账号，再 `gh auth refresh --scopes workflow` 授权一次。注意 `gh auth refresh` **没有 `--user` 参数**，它只作用于当前活动账号；不先 switch 就会出现「浏览器里授权的是 A，refresh 的是 B」的报错。
 - **协议库按 tag 引用插件仓库**：`desktop-tauri/src-tauri/server/Cargo.toml` 里 `agent2api-provider-protocol` 指向 `ProvidersPlugin/Agent2Providers` 的某个 tag。插件新增协议字段时，要等插件仓库打了新 tag 并发布后，这里才能跟上；本地联调若需要临时改协议，用 `.cargo/config.toml` 的 `[patch]` 指向本地路径，**但绝不能把那段提交**。

@@ -1,6 +1,6 @@
 # 重置面板管理员（忘记密码）
 
-**简体中文** | [English](./reset-admin.en.md) | [繁體中文](./reset-admin.zh-Hant.md) | [日本語](./reset-admin.ja.md) | [한국어](./reset-admin.ko.md) | [Português (BR)](./reset-admin.pt-BR.md)
+**简体中文** | [English](./reset-admin.en.md)
 
 本页解决一种情况：**忘了面板的管理员密码，进不去界面**。
 

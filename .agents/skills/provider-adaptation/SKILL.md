@@ -1,6 +1,6 @@
 ---
 name: provider-adaptation
-description: Agent2API（workbuddy）仓库接入新提供商（provider）与验收适配完整度的规范 —— README「支持情况一览」六列的口径、必须登记的代码与前端落点、能力探测脚本的用法、静默失效排查、六份 README 同步。凡是涉及新增一家反代 Agent / 客户端 provider、审核这类 PR、判断某家「做完了没有」、改 providers/ 下的适配器或能力位（supports_*）、给签到清单加一家、或补 README 支持矩阵时，都先按本 Skill 执行 —— 即使对方没提「provider」「适配」这类字眼。
+description: Agent2API（workbuddy）仓库接入新提供商（provider）与验收适配完整度的规范 —— README「支持情况一览」六列的口径、必须登记的代码与前端落点、能力探测脚本的用法、静默失效排查、两份 README 同步。凡是涉及新增一家反代 Agent / 客户端 provider、审核这类 PR、判断某家「做完了没有」、改 providers/ 下的适配器或能力位（supports_*）、给签到清单加一家、或补 README 支持矩阵时，都先按本 Skill 执行 —— 即使对方没提「provider」「适配」这类字眼。
 ---
 
 # Agent2API 提供商接入规范
@@ -178,16 +178,12 @@ npm run build    # 生成 ui/i18n/*.js
 
 ### 4.2 文档
 
-`README.md` 的「Supported Providers」**六份一一对应**，加一家要六份一起改（注意：**根 `README.md` 是英文**，简体中文在 `docs/README.zh-CN.md`，别把中文写回根目录）：
+`README.md` 的「Supported Providers」**两份一一对应**，加一家要两份一起改（注意：**根 `README.md` 是英文**，简体中文在 `docs/README.zh-CN.md`，别把中文写回根目录）：
 
 - `README.md`（English，GitHub 默认展示）
 - `docs/README.zh-CN.md`（简体中文，文案源语言）
-- `docs/README.zh-Hant.md`
-- `docs/README.ja.md`
-- `docs/README.ko.md`
-- `docs/README.pt-BR.md`
 
-另外注意「内置 N 家提供商」这个数字（「核心特性」一节，**六份 README 都有**，各自语言的措辞不同）。它数的是**表格里的内置行数**（不含「自定义提供商」那一行），不是 `PROVIDERS` 的条目数：
+另外注意「内置 N 家提供商」这个数字（「核心特性」一节，**两份 README 都有**，各自语言的措辞不同）。它数的是**表格里的内置行数**（不含「自定义提供商」那一行），不是 `PROVIDERS` 的条目数：
 
 - 表格把两地 / 两池合并成一行（如 `AutoClaw（国内版 / 国际版）`、`Cline（Free / Pass）`），而 `PROVIDERS` 里是两个条目；
 - 所以加一家两地 provider 时，`PROVIDERS` +2、表格只 +1 行、这个数字也只 +1。
@@ -207,7 +203,7 @@ npm run build    # 生成 ui/i18n/*.js
 5. **余额**：`supports_usage` + `query_usage` → 账号行能看到余额
 6. **签到 / 领取**：`CHECKIN_PROVIDERS` + 版本号 + `checkin_for` 分派
 7. **前端收尾**：`accounts-domain` 标记、签到中心说明、图标
-8. **i18n + 六份 README**
+8. **i18n + 两份 README**
 
 每一步做完都能独立验证，不要攒到最后一起测。
 

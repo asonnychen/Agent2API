@@ -15,9 +15,17 @@
 
 ## 文档落点
 
-安装 / 部署 / 升级 / 排错说明只在 `docs/install.md`（另有 5 份译文 `docs/install.{en,zh-Hant,ja,ko,pt-BR}.md`，六份一一对应）里维护；各语言 README 只留「快速开始」速查表 + 一个指向安装文档的链接，**不要再把安装细节写回 README**。产物名、端口、环境变量、安装脚本参数有改动时，六份一起改。
+安装 / 部署 / 升级 / 排错说明只在 `docs/install.md`（英文版 `docs/install.en.md`，两份一一对应）里维护；各语言 README 只留「快速开始」速查表 + 一个指向安装文档的链接，**不要再把安装细节写回 README**。产物名、端口、环境变量、安装脚本参数有改动时，两份一起改。
 
-**README 语言落点：根 `README.md` 是英文**（GitHub 默认展示），简体中文在 `docs/README.zh-CN.md`，其余四份为 `docs/README.{zh-Hant,ja,ko,pt-BR}.md`。中文仍是文案源语言，改支持矩阵等内容时六份同步，别把中文写回根目录。
+**README 语言落点：根 `README.md` 是英文**（GitHub 默认展示），简体中文在 `docs/README.zh-CN.md`。中文仍是文案源语言，改支持矩阵等内容时两份同步，别把中文写回根目录。
+
+## 本地构建
+
+`npm run dist` 编译两个插件与桌面端，把安装包和插件 zip 一起放进 `dist/`（已忽略，不入库）。
+
+安装包**不捆绑插件**：分发给别的机器时必须连插件 zip 一起给，由界面「插件 → 从文件安装…」手动装。插件只支持从文件安装，不做联网检查更新。
+
+只编插件：`node build/make-dist.mjs --skip-tauri`；只编桌面端：`node build/make-dist.mjs --skip-plugins`。
 
 ## Agent skills
 

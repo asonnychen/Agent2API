@@ -1,6 +1,6 @@
 # Reset the panel administrator (forgot password)
 
-[简体中文](./reset-admin.md) | **English** | [繁體中文](./reset-admin.zh-Hant.md) | [日本語](./reset-admin.ja.md) | [한국어](./reset-admin.ko.md) | [Português (BR)](./reset-admin.pt-BR.md)
+[简体中文](./reset-admin.md) | **English**
 
 This page covers one situation: **you forgot the panel administrator password and cannot sign in**.
 

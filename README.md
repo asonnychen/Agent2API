@@ -2,15 +2,17 @@
 
 # Agent2API
 
+> **This repository is a personal build.** The desktop product is named **A2A Gateway** (binary `a2a-gateway.exe`) so it can coexist with an official Agent2API install. Update source and plugin index point to this fork; plugins are installed from a local zip only.
+
 **An AI routing gateway with Agent client takeover, unifying model APIs and local client configuration**
 
-**English** | [简体中文](./docs/README.zh-CN.md) | [繁體中文](./docs/README.zh-Hant.md) | [日本語](./docs/README.ja.md) | [한국어](./docs/README.ko.md) | [Português (BR)](./docs/README.pt-BR.md)
+**English** | [简体中文](./docs/README.zh-CN.md)
 
 [![license](https://img.shields.io/badge/license-AGPL--3.0-green)](./LICENSE)
-[![release](https://img.shields.io/github/v/release/aimod-cc/Agent2API?include_prereleases)](https://github.com/aimod-cc/Agent2API/releases/latest)
+[![release](https://img.shields.io/github/v/release/asonnychen/Agent2API?include_prereleases)](https://github.com/asonnychen/Agent2API/releases/latest)
 [![docker pulls](https://img.shields.io/docker/pulls/aimodcc/agent2api)](https://hub.docker.com/r/aimodcc/agent2api)
-[![stars](https://img.shields.io/github/stars/aimod-cc/Agent2API?style=flat&color=yellow)](https://github.com/aimod-cc/Agent2API/stargazers)
-[![platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20Docker-blue)](https://github.com/aimod-cc/Agent2API/releases/latest)
+[![stars](https://img.shields.io/github/stars/asonnychen/Agent2API?style=flat&color=yellow)](https://github.com/asonnychen/Agent2API/stargazers)
+[![platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20Docker-blue)](https://github.com/asonnychen/Agent2API/releases/latest)
 
 [✨ Key Features](#-key-features) • [💬 Community & Support](#-community--support) • [🚀 Quick Start](#-quick-start) • [📦 Installation & deployment](./docs/install.en.md) • [📸 Screenshots](#-screenshots) • [🔧 Development & Build](#-development--build) • [📜 Usage Notice](#-usage-notice)
 
@@ -125,6 +127,7 @@ Trends: 24-hour **cache hit rate** (line) and **token consumption** (area) on tw
 npm run tauri:install      # Install desktop dependencies (same as npm --prefix desktop-tauri install)
 npm run tauri:dev          # Launch the desktop app in dev mode (with hot reload)
 npm run tauri:build        # Build the desktop installer
+npm run dist               # Build plugins + desktop installer into dist/ (installer + plugin zips)
 
 npm run build:icon         # Generate the icon source image (run after changing the icon design, then run tauri icon)
 ```
@@ -149,17 +152,17 @@ This project uses the same [GNU Affero General Public License v3.0 (AGPL-3.0)](.
 
 ## ⭐ Star History
 
-<a href="https://star-history.com/#aimod-cc/Agent2API&Date">
+<a href="https://star-history.com/#asonnychen/Agent2API&Date">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=aimod-cc/Agent2API&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=aimod-cc/Agent2API&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=aimod-cc/Agent2API&type=Date" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=asonnychen/Agent2API&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=asonnychen/Agent2API&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=asonnychen/Agent2API&type=Date" />
   </picture>
 </a>
 
 <div align="center">
 
-**[Download the latest release](https://github.com/aimod-cc/Agent2API/releases/latest)** • **[Report an issue](https://github.com/aimod-cc/Agent2API/issues)**
+**[Download the latest release](https://github.com/asonnychen/Agent2API/releases/latest)** • **[Report an issue](https://github.com/asonnychen/Agent2API/issues)**
 
 If this project helps you, a ⭐️ Star is appreciated!
 

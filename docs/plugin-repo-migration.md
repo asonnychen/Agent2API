@@ -1,62 +1,47 @@
-# 插件仓库（Agent2Providers）与网关的关系
+# 插件源码（Agent2Providers / Agent2WebProviders）与网关的关系
 
-插件实现与两个契约 crate 都在独立仓库
-[ProvidersPlugin/Agent2Providers](https://github.com/ProvidersPlugin/Agent2Providers)（公有）。
-网关**不包含**任何 provider 实现，只按 git tag 引用它的契约 crate。
-
-## 当前形态
+本仓库是自用构建，插件源码**不再按 git tag 从上游拉取**，而是直接放在 `plugins/` 下：
 
 | 位置 | 内容 |
 |---|---|
-| `ProvidersPlugin/Agent2Providers` | 21 家实现 + `provider-protocol` + `provider-sdk` + 打包/签名/验证脚本 + CI 矩阵 |
-| 本仓库 `server/Cargo.toml` | `agent2api-provider-protocol = { git = "...", tag = "v0.1.0" }` |
+| `plugins/Agent2Providers/` | 上游 `ProvidersPlugin/Agent2Providers` 的快照：`provider-protocol`（契约）、`provider-sdk`（trait + serve）、`crates/providers`（21 家实现，即「提供商增强」插件） |
+| `plugins/Agent2WebProviders/` | 上游 `ProvidersPlugin/Agent2WebProviders` 的快照：智谱清言与 DeepSeek 网页实现，含本仓库打的一行补丁 |
 
-主仓库里**不再有** `agent2api-providers/` 与 `desktop-tauri/src-tauri/crates/`。
-`.gitignore` 仍保留 `/agent2api-providers/` 一行 —— 防止有人在主仓库里误建
-同名目录再提交进去。
+两者都是独立 cargo workspace，`Agent2WebProviders` 通过**相对路径**依赖 `Agent2Providers` 的两个契约 crate：
+
+```toml
+# plugins/Agent2WebProviders/crates/providers/Cargo.toml
+agent2api-provider-protocol = { path = "../../../Agent2Providers/crates/provider-protocol" }
+agent2api-provider-sdk = { path = "../../../Agent2Providers/crates/provider-sdk" }
+```
+
+好处：改协议本地立刻生效，不需要打 tag、发版、再 `cargo update`；离线也能编译。
 
 ## 改协议的流程
 
-1. 在 Agent2Providers 仓库改 `crates/provider-protocol/`
-2. 打新 tag：`git tag v0.1.1 && git push origin v0.1.1`
-3. 改本仓库 `server/Cargo.toml` 的 `tag`
-4. `cargo update -p agent2api-provider-protocol`（**必须**，否则 Cargo 继续用
-   `Cargo.lock` 里记的旧提交）
-5. 编译验证：`cd desktop-tauri/src-tauri && cargo check -p agent2api-server`
-
-## 本地联调（同时改网关与契约库）
-
-不想每改一次就发 tag，在**仓库根**建 `.cargo/config.toml`：
-
-```toml
-[patch."https://github.com/ProvidersPlugin/Agent2Providers"]
-agent2api-provider-protocol = { path = "../Agent2Providers/crates/provider-protocol" }
-```
-
-相对路径按实际 checkout 位置写。这个文件**不要提交** —— 它绑定个人磁盘布局。
+1. 改 `plugins/Agent2Providers/crates/provider-protocol/`
+2. 直接编译验证两个插件：
+   ```bash
+   cargo build --release -p agent2api-web-providers --manifest-path plugins/Agent2WebProviders/Cargo.toml
+   cargo build --release -p agent2api-providers    --manifest-path plugins/Agent2Providers/Cargo.toml
+   ```
+3. 重新打插件包：`npm run dist -- --skip-tauri`
 
 ## 打插件包
 
-在 Agent2Providers 仓库：
+每个插件目录下都有自己的 `scripts/pack.mjs`：
 
 ```bash
-node scripts/pack.mjs                              # 当前平台
-node scripts/verify.mjs                            # 协议验证（28 项）
-node scripts/sign.mjs sign --zip dist/*.zip        # 签名（需先生成密钥）
+node plugins/Agent2WebProviders/scripts/pack.mjs --skip-build --out dist
+node plugins/Agent2Providers/scripts/pack.mjs    --skip-build --out dist
 ```
 
-产物是 `dist/agent2api-providers-<version>-<target>.zip`，五个平台各一份。
-CI 矩阵（`.github/workflows/build.yml`）在五个平台各编一次、各自真机跑一遍
-协议验证，产物上传为 workflow artifact，**不挂 Release**。
+产物是 `dist/<id>-<version>-<target>.zip`，在网关界面「插件 → 从文件安装…」里选中即可。
 
-## 还没做的两件事
+`npm run dist` 会依次完成：编译两个插件 → 打包 → 编译桌面端 → 把安装包与插件 zip 一起放进 `dist/`。
 
-**签名密钥。** 网关的 `OFFICIAL_PUBKEYS` 仍是空表，所有包显示「未签名」。
-启用步骤：在插件仓库 `node scripts/sign.mjs keygen`，把打印的公钥填进
-`server/src/server/core/plugin_host/install.rs` 的 `OFFICIAL_PUBKEYS`，
-重新编译网关，再给每个 zip 签名。
+## 与上游的关系
 
-**更新检查。** `plugin_host/update.rs` 的 `PLUGIN_REPO` 已指向
-`ProvidersPlugin/Agent2Providers`，但插件包只出 artifact、不挂 Release，所以「检查
-更新」永远返回「没有可更新的版本」。要么把 zip 挂到 Release，要么把这个入口
-改成「打开下载页」。
+这两个目录是**快照复制**，不是 git submodule / subtree。上游发新版不会自动跟进；要升级就重新复制一份并重新打补丁（DeepSeek 的 `Content-Type` 修复见 `crates/providers/src/providers/deepseek/mod.rs` 的 `headers()`）。
+
+因为更新源与插件索引都指向本仓库（`asonnychen/Agent2API`），且插件自动更新默认关闭，已安装的插件不会被官方新包覆盖。

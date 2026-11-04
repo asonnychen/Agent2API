@@ -2,15 +2,17 @@
 
 # Agent2API
 
+> **本仓库是个人自用构建。** 桌面端产品名为 **A2A Gateway**（主程序 `a2a-gateway.exe`），可与官方 Agent2API 并存安装。更新源与插件索引指向本仓库；插件只支持从本地 zip 安装。
+
 **AI 路由网关 + Agent 客户端接管，统一管理模型接口与本机客户端配置**
 
-[English](../README.md) | **简体中文** | [繁體中文](./README.zh-Hant.md) | [日本語](./README.ja.md) | [한국어](./README.ko.md) | [Português (BR)](./README.pt-BR.md)
+[English](../README.md) | **简体中文**
 
 [![license](https://img.shields.io/badge/license-AGPL--3.0-green)](../LICENSE)
-[![release](https://img.shields.io/github/v/release/aimod-cc/Agent2API?include_prereleases)](https://github.com/aimod-cc/Agent2API/releases/latest)
+[![release](https://img.shields.io/github/v/release/asonnychen/Agent2API?include_prereleases)](https://github.com/asonnychen/Agent2API/releases/latest)
 [![docker pulls](https://img.shields.io/docker/pulls/aimodcc/agent2api)](https://hub.docker.com/r/aimodcc/agent2api)
-[![stars](https://img.shields.io/github/stars/aimod-cc/Agent2API?style=flat&color=yellow)](https://github.com/aimod-cc/Agent2API/stargazers)
-[![platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20Docker-blue)](https://github.com/aimod-cc/Agent2API/releases/latest)
+[![stars](https://img.shields.io/github/stars/asonnychen/Agent2API?style=flat&color=yellow)](https://github.com/asonnychen/Agent2API/stargazers)
+[![platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20Docker-blue)](https://github.com/asonnychen/Agent2API/releases/latest)
 
 [✨ 核心特性](#-核心特性) • [💬 社区与支持](#-社区与支持) • [🚀 快速开始](#-快速开始) • [📦 安装与部署](./install.md) • [📸 界面预览](#-界面预览) • [🔧 开发与构建](#-开发与构建) • [📜 使用声明](#-使用声明)
 
@@ -125,6 +127,7 @@ docker run -d --name agent2api --restart unless-stopped -p 3065:3065 -v ./data:/
 npm run tauri:install      # 安装桌面端依赖（等价 npm --prefix desktop-tauri install）
 npm run tauri:dev          # 开发模式调起桌面端（自动热重载）
 npm run tauri:build        # 构建桌面端安装包
+npm run dist               # 编译插件与桌面端，产物（安装包 + 插件 zip）放到 dist/
 
 npm run build:icon         # 生成图标源图（改图标设计后执行，再跑 tauri icon）
 ```
@@ -149,17 +152,17 @@ macOS 的 `.dmg` **只能在 macOS 上构建**（`npm --prefix desktop-tauri run
 
 ## ⭐ Star History
 
-<a href="https://star-history.com/#aimod-cc/Agent2API&Date">
+<a href="https://star-history.com/#asonnychen/Agent2API&Date">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=aimod-cc/Agent2API&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=aimod-cc/Agent2API&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=aimod-cc/Agent2API&type=Date" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=asonnychen/Agent2API&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=asonnychen/Agent2API&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=asonnychen/Agent2API&type=Date" />
   </picture>
 </a>
 
 <div align="center">
 
-**[下载最新版](https://github.com/aimod-cc/Agent2API/releases/latest)** • **[问题反馈](https://github.com/aimod-cc/Agent2API/issues)**
+**[下载最新版](https://github.com/asonnychen/Agent2API/releases/latest)** • **[问题反馈](https://github.com/asonnychen/Agent2API/issues)**
 
 如果这个项目对你有帮助，欢迎点一个 ⭐️ Star！
 
