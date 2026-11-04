@@ -34,7 +34,7 @@ function TitleBar({ api }: { api: WindowBridge }) {
     return typeof dispose === 'function' ? dispose as () => void : undefined
   }, [api, sync])
   const isMac = api.platform === 'macos'
-  const title = api.title || t('Agent2API · 多提供商本地网关')
+  const title = api.title || t('A2A Gateway · 多提供商本地网关')
   const icon = (window as unknown as { wbIcons?: { icon(name: string, size: number): string } }).wbIcons?.icon('brand', 16) || ''
   return <WindowTitleBar className={isMac ? 'titlebar is-macos pl-[84px] pr-3.5' : 'titlebar'}>
     <div className='titlebar-brand pointer-events-none flex min-w-0 items-center gap-2 text-[12.5px] font-semibold [&_*]:pointer-events-none'>
@@ -54,7 +54,7 @@ function mount() {
   const container = document.createElement('div')
   document.body.prepend(container)
   document.body.classList.add('has-titlebar')
-  document.title = bridge.title || t('Agent2API · 多提供商本地网关')
+  document.title = bridge.title || t('A2A Gateway · 多提供商本地网关')
   createRoot(container).render(<TitleBar api={bridge} />)
 }
 

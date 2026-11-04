@@ -1,6 +1,6 @@
 {
-  "name": "Agent2API 网关面板",
-  "short_name": "Agent2API",
+  "name": "A2A Gateway 网关面板",
+  "short_name": "A2A Gateway",
   "description": "多提供商本地 AI 网关面板",
   "start_url": "/",
   "scope": "/",

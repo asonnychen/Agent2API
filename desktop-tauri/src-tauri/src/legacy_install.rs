@@ -11,7 +11,7 @@
 //! ── 只删「确认是本产品」的目标 ────────────────────────────────────
 //! 判定链每一环都必须成立，任何一环不成立就跳过（宁可留下垃圾，也绝不误删
 //! 用户自己安装的其它软件）：
-//!   目录     必须存在本产品主程序（`agent2api.exe` / `workbuddy-proxy-desktop.exe`）；
+//!   目录     必须存在本产品主程序（`a2a-gateway.exe`）；
 //!   卸载键   键名与 DisplayName 都要等于本产品的历史/现用名，且键里记录的安装
 //!            位置要落在对应旧目录内、该目录已经不存在；
 //!   快捷方式 文件名等于产品名，且 .lnk 内容里出现旧目录的绝对路径；
@@ -55,19 +55,19 @@ mod imp {
 
     /// 本产品用过的产品名。NSIS 在 currentUser 模式下把这些名字同时用作
     /// 安装目录名（`%LOCALAPPDATA%\<产品名>`）、卸载键名与快捷方式名。
-    const PRODUCT_NAMES: [&str; 2] = ["Agent2API", "WorkBuddy 本地代理"];
+    ///
+    /// ── 为什么不再列 `Agent2API` ──────────────────────────────
+    /// 2026-11 产品改名为 A2A Gateway，改名后它是**独立产品**，可以与用户
+    /// 已经安装的 Agent2API 并存。这里若继续把 `Agent2API` 当作「自己的旧版」，
+    /// 新应用一启动就会把并存的那个安装目录、快捷方式和卸载项当成垃圾清掉。
+    /// 因此只认本产品自己的名字。
+    const PRODUCT_NAMES: [&str; 1] = ["A2A Gateway"];
 
     /// 旧安装目录里可能出现的主程序文件名。
     ///
-    /// `workbuddy-proxy-desktop.exe` 是用过很久的产物名：Cargo.toml 的 package
-    /// name 一直是 `workbuddy-proxy-desktop`，早期 tauri.conf.json 又没设
-    /// mainBinaryName，NSIS 的 MAINBINARYNAME 与磁盘上的 exe 都是它（已按构建出的
-    /// installer.nsi 与真实安装目录核对）。现在 tauri.conf.json 把 mainBinaryName
-    /// 设成 `agent2api`，新装的目录里是 `agent2api.exe`。
-    ///
-    /// 两个名字都留着：判定对象是**历史**安装目录，里面是哪一个取决于当初装的是
-    /// 哪个版本，判定链不该因为改名而失效。
-    const BINARY_NAMES: [&str; 2] = ["workbuddy-proxy-desktop.exe", "agent2api.exe"];
+    /// 只登记本产品自己的产物名。`agent2api.exe` / `workbuddy-proxy-desktop.exe`
+    /// 属于改名前的另一个产品，留在这里会让判定链把并存安装误认成自己的旧版。
+    const BINARY_NAMES: [&str; 1] = ["a2a-gateway.exe"];
 
     /// 当前用户级安装的卸载信息（NSIS 的 currentUser 模式写这里）
     const UNINSTALL_KEY: &str = "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall";

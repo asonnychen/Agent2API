@@ -86,7 +86,7 @@ function Frame() {
   const sidebar = <Sidebar className='sidebar'>
     <SidebarHeader className='brand'>
       <div className='brand-logo'><Icon name='brand' size={32} /></div>
-      <div className='brand-text'><h1>Agent2API</h1></div>
+      <div className='brand-text'><h1>A2A Gateway</h1></div>
     </SidebarHeader>
     <NavList render={<SidebarContent />} className='nav' id='nav' aria-label={t('主导航')} onClick={event => {
       const item = (event.target as Element).closest<HTMLElement>('.nav-item[data-page]')
@@ -108,7 +108,7 @@ function Frame() {
     <main className='main'>
       <PageHeader className='topbar'>
         <Button variant='ghost' size='icon' className='mobile-menu-btn' aria-label={t('切换菜单')} onClick={() => setOpen(!open)}>☰</Button>
-        <div className='crumb'><span>Agent2API</span><span className='sep'>/</span><span className='cur' id='crumb-page'>{label}</span></div>
+        <div className='crumb'><span>A2A Gateway</span><span className='sep'>/</span><span className='cur' id='crumb-page'>{label}</span></div>
         <div className='spacer' />
         <div className='topbar-actions' id='topbar-status' title={title}><TopbarStatus /></div>
       </PageHeader>

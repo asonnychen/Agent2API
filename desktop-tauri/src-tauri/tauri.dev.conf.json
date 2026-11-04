@@ -1,4 +1,4 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "identifier": "com.workbuddy.local-proxy.dev"
+  "identifier": "com.a2a.gateway.dev"
 }

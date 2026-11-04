@@ -72,9 +72,9 @@ pub const MAIN_WINDOW_LABEL: &str = "main";
 /// 判据取 `debug_assertions`，与下面「开发态不做安装迁移 / 自启刷新」同一个口径。
 pub fn app_title() -> &'static str {
     if cfg!(debug_assertions) {
-        "[Dev]Agent2API·多提供商本地网关"
+        "[Dev]A2A Gateway·多提供商本地网关"
     } else {
-        "Agent2API · 多提供商本地网关"
+        "A2A Gateway · 多提供商本地网关"
     }
 }
 
@@ -120,7 +120,7 @@ fn report_startup_failure(app: &tauri::AppHandle, error: &str) {
     const FORCE_EXIT_AFTER: std::time::Duration = std::time::Duration::from_secs(300);
 
     let message = format!(
-        "Agent2API 启动已中止：{error}\n\n\
+        "A2A Gateway 启动已中止：{error}\n\n\
          本次未改动、未删除任何旧数据，也未创建新配置目录。\
          排除原因（磁盘空间、文件占用、权限）后重新打开本程序即可自动重试迁移。"
     );
@@ -128,7 +128,7 @@ fn report_startup_failure(app: &tauri::AppHandle, error: &str) {
     let handle = app.clone();
     app.dialog()
         .message(message)
-        .title("Agent2API 无法启动")
+        .title("A2A Gateway 无法启动")
         .kind(MessageDialogKind::Error)
         .show(move |_| handle.exit(1));
 

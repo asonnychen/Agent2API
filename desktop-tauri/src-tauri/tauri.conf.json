@@ -1,9 +1,9 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Agent2API",
-  "mainBinaryName": "agent2api",
-  "version": "3.4.0",
-  "identifier": "com.workbuddy.local-proxy",
+  "productName": "A2A Gateway",
+  "mainBinaryName": "a2a-gateway",
+  "version": "3.4.1",
+  "identifier": "com.a2a.gateway",
   "build": {
     "frontendDist": "../ui"
   },
@@ -16,8 +16,8 @@
   },
   "bundle": {
     "active": true,
-    "publisher": "Agent2API",
-    "copyright": "Copyright (c) 2026 Agent2API",
+    "publisher": "A2A Gateway",
+    "copyright": "Copyright (c) 2026 A2A Gateway",
     "targets": [
       "nsis"
     ],
@@ -44,7 +44,7 @@
         ]
       }
     },
-    "shortDescription": "Agent2API · 多提供商本地网关",
+    "shortDescription": "A2A Gateway · 多提供商本地网关",
     "longDescription": "把多家 AI 客户端登录态（WorkBuddy、小浣熊等）包装成本地 OpenAI 兼容接口，并集中管理多账号、出网代理与内容脱敏。网关已整体由 Rust 实现并运行在应用进程内，不再随包分发任何外部运行时，安装体积小、启动即用。"
   }
 }

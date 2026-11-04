@@ -762,13 +762,13 @@ pub async fn export_database(
         return Err("备份密码需要至少 12 位，且不能超过 1024 字节".into());
     }
     let stamp = timestamp_for_filename();
-    let default_name = format!("agent2api-backup-{stamp}.a2ab");
+    let default_name = format!("a2a-gateway-backup-{stamp}.a2ab");
     let file = app
         .dialog()
         .file()
         .set_title("整库备份")
         .set_file_name(&default_name)
-        .add_filter("Agent2API 加密备份", &["a2ab"])
+        .add_filter("A2A Gateway 加密备份", &["a2ab"])
         .blocking_save_file();
     let Some(target) = file else {
         return Ok(json!({ "canceled": true }));
@@ -814,7 +814,7 @@ pub async fn import_database(app: AppHandle, password: Option<String>) -> Result
         .dialog()
         .file()
         .set_title("整库恢复")
-        .add_filter("Agent2API 备份", &["a2ab", "sql"])
+        .add_filter("A2A Gateway 备份", &["a2ab", "sql"])
         .add_filter("全部文件", &["*"])
         .blocking_pick_file();
     let Some(target) = file else {
