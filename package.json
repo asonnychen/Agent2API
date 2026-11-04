@@ -32,7 +32,7 @@
   "author": "Agent2API",
   "repository": {
     "type": "git",
-    "url": "https://github.com/aimod-cc/Agent2API.git"
+    "url": "https://github.com/asonnychen/Agent2API.git"
   },
   "license": "AGPL-3.0-only",
   "engines": {
