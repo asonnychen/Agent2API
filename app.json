@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "updated": "2026-11-04",
+  "app": {
+    "repo": "asonnychen/Agent2API",
+    "forceUpdate": {
+      "stable": { "minimumVersion": null, "targetVersion": null, "message": "" },
+      "beta": { "minimumVersion": null, "targetVersion": null, "message": "" }
+    }
+  }
+}
